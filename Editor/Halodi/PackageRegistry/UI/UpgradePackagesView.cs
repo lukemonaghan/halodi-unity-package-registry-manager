@@ -1,3 +1,5 @@
+//Modifications copyright (C) 2021 Luke Monaghan
+
 using System;
 using System.Collections.Generic;
 using Halodi.PackageRegistry.Core;
@@ -8,7 +10,7 @@ namespace Halodi.PackageRegistry.UI
 {
     internal class UpgradePackagesView : EditorWindow
     {
-        [MenuItem("Packages/Upgrade Packages", false, 23)]
+        [MenuItem("Window/Packages/Upgrade Packages", false, 23)]
         internal static void ManageRegistries()
         {
             EditorWindow.GetWindow<UpgradePackagesView>(true, "Upgrade packages", true);

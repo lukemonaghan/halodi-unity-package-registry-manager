@@ -1,4 +1,6 @@
-﻿using System;
+﻿//Modifications copyright (C) 2021 Luke Monaghan
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Halodi.PackageRegistry.Core;
@@ -10,7 +12,7 @@ namespace Halodi.PackageRegistry.UI
 {
     public class RegistryManagerView : EditorWindow
     {
-        [MenuItem("Packages/Manage scoped registries", false, 21)]
+        [MenuItem("Window/Packages/Manage scoped registries", false, 21)]
         internal static void ManageRegistries()
         {
             SettingsService.OpenProjectSettings("Project/Package Manager/Credentials");

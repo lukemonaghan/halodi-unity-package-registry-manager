@@ -1,8 +1,10 @@
+//Modifications copyright (C) 2021 Luke Monaghan
 
 using System;
 using Halodi.PackageRegistry.Core;
 using UnityEditor;
 using UnityEngine;
+using Halodi.PackageRegistry.NPM;
 
 namespace Halodi.PackageRegistry.UI
 {
@@ -15,13 +17,11 @@ namespace Halodi.PackageRegistry.UI
         private bool createNew;
 
         private ScopedRegistry registry;
-
-        private int tokenMethod;
+        private GetTokenView tokenView;
 
 
         void OnEnable()
         {
-            tokenMethod = 0;
             minSize = new Vector2(480, 320);
         }
 
@@ -50,6 +50,7 @@ namespace Halodi.PackageRegistry.UI
             this.initialized = true;
         }
 
+
         void OnGUI()
         {
             if (initialized)
@@ -77,7 +78,7 @@ namespace Halodi.PackageRegistry.UI
                 EditorGUILayout.Space();
 
                 EditorGUI.BeginDisabledGroup(string.IsNullOrEmpty(registry.url));
-                tokenMethod = GetTokenView.CreateGUI(tokenMethod, registry);
+                tokenView.DrawTokenView(registry);
                 
                 if (!string.IsNullOrEmpty(registry.url) && string.IsNullOrEmpty(registry.token))
                 {
@@ -141,8 +142,5 @@ namespace Halodi.PackageRegistry.UI
                 EditorUtility.DisplayDialog("Invalid", "Invalid settings for credential.", "Ok");
             }
         }
-
-
-
     }
 }

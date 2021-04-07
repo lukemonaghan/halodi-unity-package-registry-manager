@@ -1,3 +1,4 @@
+//Modifications copyright (C) 2021 Luke Monaghan
 
 using System;
 using Halodi.PackageRegistry.Core;
@@ -16,12 +17,10 @@ namespace Halodi.PackageRegistry.UI
         private bool createNew;
 
         private ScopedRegistry registry;
+        private GetTokenView tokenView;
 
-        private int tokenMethod;
         void OnEnable()
         {
-            tokenMethod = 0;
-
             minSize = new Vector2(480, 320);
         }
 
@@ -102,7 +101,7 @@ namespace Halodi.PackageRegistry.UI
 
                 EditorGUILayout.Space();
 
-                tokenMethod = GetTokenView.CreateGUI(tokenMethod, registry);
+                tokenView.DrawTokenView(registry);
                 
                 EditorGUILayout.Space();
                 EditorGUILayout.BeginVertical(GUILayout.ExpandHeight(true));

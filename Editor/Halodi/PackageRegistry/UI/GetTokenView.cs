@@ -1,3 +1,5 @@
+//Modifications copyright (C) 2021 Luke Monaghan
+
 using System;
 using Halodi.PackageRegistry.Core;
 using Halodi.PackageRegistry.NPM;
@@ -21,80 +23,23 @@ namespace Halodi.PackageRegistry.UI
         }
     }
 
-    internal class GetTokenView : EditorWindow
+    internal struct GetTokenView
     {
         private static TokenMethod[] methods = {
-                new TokenMethod("npm login", "Registry username", "Registry password", GetNPMLoginToken),
-                new TokenMethod("bintray", "Bintray username", "Bintray API key", GetBintrayToken),
-                // TODO adjust TokenMethod to allow for opening GitHub token URL: https://github.com/settings/tokens/new
-            };
-
+            new TokenMethod("npm login", "username", "password", GetNPMLoginToken),
+            new TokenMethod("bintray", "username", "API key", GetBintrayToken),
+            // TODO adjust TokenMethod to allow for opening GitHub token URL: https://github.com/settings/tokens/new
+        };
 
         private string username;
         private string password;
-
-        private bool initialized = false;
-
         private TokenMethod tokenMethod;
+        private int selectedIndex;
 
-        private ScopedRegistry registry;
-
-
-        void OnEnable()
-        {
-            error = null;
-        }
-
-        void OnDisable()
-        {
-            initialized = false;
-        }
-
-        private void SetRegistry(TokenMethod tokenMethod, ScopedRegistry registry)
-        {
-            this.tokenMethod = tokenMethod;
-            this.registry = registry;
-            this.initialized = true;
-        }
-
-        void OnGUI()
-        {
-            if (initialized)
-            {
-                EditorGUILayout.LabelField(tokenMethod, EditorStyles.whiteLargeLabel);
-                username = EditorGUILayout.TextField(tokenMethod.usernameName, username);
-                password = EditorGUILayout.PasswordField(tokenMethod.passwordName, password);
-
-                if (GUILayout.Button("Login"))
-                {
-                    if(tokenMethod.action(registry, username, password))
-                    {
-                        CloseWindow();
-                    }
-                }
-
-                if (GUILayout.Button("Close"))
-                {
-                    CloseWindow();
-                }
-
-                if (!string.IsNullOrEmpty(error))
-                {
-                    EditorGUILayout.HelpBox(error, MessageType.Error);
-                }
-            }
-        }
-
-        private static void CreateWindow(TokenMethod method, ScopedRegistry registry)
-        {
-            GetTokenView getTokenView = EditorWindow.GetWindow<GetTokenView>(true, "Get token", true);
-            getTokenView.SetRegistry(method, registry);
-        }
-
-        private static string error = null;
-
+        private static string error;
         private static bool GetNPMLoginToken(ScopedRegistry registry, string username, string password)
         {
+            error = null;
             NPMResponse response = NPMLogin.GetLoginToken(registry.url, username, password);
 
             if (string.IsNullOrEmpty(response.ok))
@@ -112,37 +57,36 @@ namespace Halodi.PackageRegistry.UI
 
         private static bool GetBintrayToken(ScopedRegistry registry, string username, string password)
         {
+            error = null;
             registry.token = NPMLogin.GetBintrayToken(username, password);
             return !string.IsNullOrEmpty(registry.token);
         }
 
-
-        private void CloseWindow()
-        {
-            error = null;
-            foreach (var view in Resources.FindObjectsOfTypeAll<CredentialEditorView>())
-            {
-                view.Repaint();
-            }
-            Close();
-            GUIUtility.ExitGUI();
-        }
-
-
-        internal static int CreateGUI(int selectedIndex, ScopedRegistry registry)
+        internal void DrawTokenView(ScopedRegistry registry)
         {
             EditorGUILayout.LabelField("Generate token", EditorStyles.whiteLargeLabel);
-            EditorGUILayout.BeginHorizontal();
+            registry.token = EditorGUILayout.TextField("Token", registry.token);
+            
             selectedIndex = EditorGUILayout.Popup(new GUIContent("Method"), selectedIndex, methods);
 
-            if(GUILayout.Button("Login & get auth token"))
+            var tokenMethod = methods[selectedIndex];
+
+            EditorGUILayout.LabelField(tokenMethod, EditorStyles.whiteLargeLabel);
+            username = EditorGUILayout.TextField(tokenMethod.usernameName, username);
+            password = EditorGUILayout.PasswordField(tokenMethod.passwordName, password);
+
+            if (GUILayout.Button("Login") && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
             {
-                CreateWindow(methods[selectedIndex], registry);
+                if(tokenMethod.action(registry, username, password))
+                {
+                    // done
+                }
             }
 
-            EditorGUILayout.EndHorizontal();
-
-            return selectedIndex;
+            if (!string.IsNullOrEmpty(error))
+            {
+                EditorGUILayout.HelpBox(error, MessageType.Error);
+            }
         }
     }
 }

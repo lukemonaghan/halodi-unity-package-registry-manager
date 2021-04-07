@@ -1,4 +1,6 @@
-﻿using System;
+﻿//Modifications copyright (C) 2021 Luke Monaghan
+
+using System;
 using System.IO;
 using System.Threading;
 using UnityEditor;
@@ -12,7 +14,7 @@ namespace Halodi.PackageRegistry.UI
     {
         private string PackageList = "";
 
-        [MenuItem("Packages/Add packages (bulk)", false, 22)]
+        [MenuItem("Window/Packages/Add packages (bulk)", false, 22)]
         internal static void ManageRegistries()
         {
             EditorWindow.GetWindow<BulkAddPackages>(true, "Add packages", true);
